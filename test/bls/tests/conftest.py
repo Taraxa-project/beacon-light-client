@@ -1,16 +1,12 @@
-import hashlib
 import json
 import os
-import eth_tester
 import pytest
 
 from eth.vm.forks.berlin import BerlinVM
-from eth_tester import EthereumTester, PyEVMBackend
 from py_ecc.bls.ciphersuites import G2ProofOfPossession
 from py_ecc.bls.g2_primatives import pubkey_to_G1, signature_to_G2
 from py_ecc.optimized_bls12_381.optimized_curve import normalize
-from web3 import Web3
-from web3.providers.eth_tester import EthereumTesterProvider
+from web3 import HTTPProvider, Web3
 from solcx import link_code
 
 DIR = os.path.dirname(__file__)
@@ -29,64 +25,74 @@ def get_bls_library_json():
     filename = os.path.join(DIR, "../../../out/BLS.sol/BLS.json")
     return _get_json(filename)
 
-
 @pytest.fixture
-def berlin_vm_configuration():
-    return ((0, BerlinVM),)
-
-
-@pytest.fixture
-def tester(berlin_vm_configuration):
-    return EthereumTester(PyEVMBackend(vm_configuration=berlin_vm_configuration))
-
-
-@pytest.fixture
-def w3(tester):
-    web3 = Web3(EthereumTesterProvider(tester))
+def w3():
+    web3 = Web3(HTTPProvider("http://127.0.0.1:7777"))
     return web3
 
+@pytest.fixture
+def private_key():
+    return "0xfc6c309495809b69ce77b3250cacfef94d28698d8fb425501a59836fe30fab1d"
 
-def _deploy_contract(contract_json, w3, *args):
+@pytest.fixture
+def account(w3, private_key):
+    return w3.eth.account.from_key(private_key)
+
+def _deploy_contract(contract_json, w3, account, *args):
     contract_bytecode = contract_json["bytecode"]["object"]
-    bls_lib = bls_library(w3)
+    bls_lib = bls_library(w3, account)
     contract_bytecode = link_code(contract_bytecode, {'src/bls12381/BLS.sol:BLS': bls_lib})
     contract_abi = contract_json["abi"]
     registration = w3.eth.contract(abi=contract_abi, bytecode=contract_bytecode)
-    tx_hash = registration.constructor(*args).transact()
-    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    nonce = w3.eth.get_transaction_count(account.address)
+    transaction = registration.constructor(*args).build_transaction({
+        'from': account.address,
+        'nonce': nonce,
+        'gas': 2000000,  # Set appropriate gas limit
+        'gasPrice': w3.to_wei('1', 'wei')  # Set appropriate gas price
+    })
+    signed_txn = account.sign_transaction(transaction)
+    tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+
+    # Custom timeout and poll_latency values
+    custom_timeout = 180  # e.g., 180 seconds
+    custom_poll_latency = 0.5  # e.g., 0.2 seconds
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=custom_timeout, poll_latency=custom_poll_latency)
+
     contract_deployed = w3.eth.contract(
         address=tx_receipt.contractAddress, abi=contract_abi
     )
     return contract_deployed
 
-def _deploy_library(contract_json, w3, *args):
+def _deploy_library(contract_json, w3, account, *args):
     contract_bytecode = contract_json["bytecode"]["object"]
     contract_abi = contract_json["abi"]
     registration = w3.eth.contract(abi=contract_abi, bytecode=contract_bytecode)
-    tx_hash = registration.constructor(*args).transact()
-    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+
+    nonce = w3.eth.get_transaction_count(account.address)
+    transaction = registration.constructor(*args).build_transaction({
+        'from': account.address,
+        'nonce': nonce,
+        'gas': 2000000,  # You might need to adjust this value
+        'gasPrice': w3.to_wei('1', 'wei')  # You might need to adjust this value
+    })
+
+    signed_txn = account.sign_transaction(transaction)
+    tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+
+    custom_timeout = 180  # e.g., 180 seconds
+    custom_poll_latency = 0.5  # e.g., 0.2 seconds
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=custom_timeout, poll_latency=custom_poll_latency)
+
     return tx_receipt.contractAddress
 
 
 @pytest.fixture
-def bls_contract(w3):
-    return _deploy_contract(get_bls_contract_json(), w3)
+def bls_contract(w3, account):
+    return _deploy_contract(get_bls_contract_json(), w3, account)
 
-def bls_library(w3):
-    return _deploy_library(get_bls_library_json(), w3)
-
-
-@pytest.fixture
-def assert_tx_failed(tester):
-    def assert_tx_failed(
-        function_to_test, exception=eth_tester.exceptions.TransactionFailed
-    ):
-        snapshot_id = tester.take_snapshot()
-        with pytest.raises(exception):
-            function_to_test()
-        tester.revert_to_snapshot(snapshot_id)
-
-    return assert_tx_failed
+def bls_library(w3, account):
+    return _deploy_library(get_bls_library_json(), w3, account)
 
 
 @pytest.fixture
@@ -139,4 +145,3 @@ def signature_witness(signature):
 @pytest.fixture
 def dst():
     return G2ProofOfPossession.DST
-

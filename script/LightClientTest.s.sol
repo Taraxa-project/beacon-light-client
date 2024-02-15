@@ -7,12 +7,7 @@ import "../src/BeaconLightClientUpdate.sol";
 
 contract LightClientTest is Script, BeaconLightClientUpdate {
 
-    function name() public pure returns (string memory) {
-        return "LightClientTest";
-    }
-
     function run() public {
-        vm.broadcast();
         BeaconLightClient lightclient = BeaconLightClient(0xd072a2CD38ff9e8Fd24583B07008D50d971d5B84);
         FinalizedHeaderUpdate memory header_update = build_header_update();
         lightclient.import_finalized_header(header_update);
