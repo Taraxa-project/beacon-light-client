@@ -5,60 +5,9 @@ import { Script, console2 } from "forge-std/Script.sol";
 import "../src/EthereumMessageRootOracle.sol";
 import "../src/BeaconLightClientUpdate.sol";
 
-contract Deploy is Script, BeaconLightClientUpdate {
-
-    function name() public pure returns (string memory) {
-        return "Deploy";
-    }
+contract LightClientTest is Script, BeaconLightClientUpdate {
 
     function run() public {
-        vm.broadcast();
-        uint64 slot                     = 6242304;
-        uint64 proposer_index           = 371683;
-        bytes32 parent_root             = 0x16f93626bc460e8449b5b905cf3584aa5ba4800ab39faa00b314bd384859904b;
-        bytes32 state_root              = 0x40594ba8043186666a95a0bbe61dfa98abdb918822f85524c18cd6d43e47aa47;
-        bytes32 body_root               = 0xbce8b928647016041dc771d82245b76ffeb0f07cc8d685acb9c22244df7189f3;
-        uint256 block_number            = 0;
-        bytes32 merkle_root             = 0x0000000000000000000000000000000000000000000000000000000000000000;
-        bytes32 sync_committee_hash     = 0x344e99e6b29e1ffa0481053f25004cd8a0e0417804f3a22eaecb9e0d2948fb70;
-        bytes32 genesis_validators_root = 0x4b363db94e286120d76eb905340fdd4e54bfe9f06bf33ff6cf5ad27f511bfe95;
-        new EthereumMessageRootOracle(
-            slot,
-            proposer_index,
-            parent_root,
-            state_root,
-            body_root,
-            block_number,
-            merkle_root,
-            sync_committee_hash,
-            genesis_validators_root
-        );
-    }
-
-    function args() internal pure returns (bytes memory) {
-        uint64 slot = 7825376;
-        uint64 proposer_index = 550054;
-        bytes32 parent_root = 0x43fcc72d547536eeaf4e43454fbc82fbd3d475dbe2890f96281c5d004312ce3e;
-        bytes32 state_root = 0xcea628f2339d80944daece5214c61effee317f8d9bf71ec21625e98d3c76d022;
-        bytes32 body_root = 0x4e45b5935b52b809daba32f1ba9faae64af12d3f9d6847db393021c593c904c4;
-        uint256 block_number = 18633272;
-        bytes32 merkle_root = 0xf4036d4b1a025802e88b41881d098fd2b63a95f74d961713c2756b253a0391c6;
-        bytes32 sync_committee_hash = 0x4e6ce20e67e1c347266408d0d58de1dba560025e2b60536d376d9b7af91fed24;
-        bytes32 genesis_validators_root = 0xd8ea171f3c94aea21ebc42a1ed61052acf3f9209c00e4efbaaddac09ed9b8078;
-        return abi.encode(
-            slot,
-            proposer_index,
-            parent_root,
-            state_root,
-            body_root,
-            block_number,
-            merkle_root,
-            sync_committee_hash,
-            genesis_validators_root
-        );
-    }
-
-    function test_import_finalized_header() public {
         BeaconLightClient lightclient = BeaconLightClient(0xd072a2CD38ff9e8Fd24583B07008D50d971d5B84);
         FinalizedHeaderUpdate memory header_update = build_header_update();
         lightclient.import_finalized_header(header_update);

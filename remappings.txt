@@ -1,4 +1,2 @@
-ds-test/=lib/create3-deploy/lib/forge-std/lib/ds-test/src/
-forge-std/=lib/create3-deploy/lib/forge-std/src/
-solmate/=lib/create3-deploy/lib/solmate/src/
-create3-deploy/=lib/create3-deploy/
+ds-test/=lib/forge-std/lib/ds-test/src/
+forge-std/=lib/forge-std/src/

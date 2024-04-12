@@ -534,7 +534,7 @@ def test_sync_committee_aggregate_pks(bls_contract):
     uncompressed_pubkeys = [normalize(pubkey_to_G1(bytes.fromhex(pk))) for pk in pks]
     serialized_pks = [ _serialize_uncompressed_g1(pk) for pk in uncompressed_pubkeys ]
 
-    agg_pk = bls_contract.functions.aggregate_pks(serialized_pks).call({
+    agg_pk = bls_contract.functions.aggregate_pks(serialized_pks)().call({
         'gas': 20000000
     })
     s_agg_pk = bls_contract.functions.serialize_g1(agg_pk).call()
