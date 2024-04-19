@@ -95,6 +95,8 @@ contract BeaconChain is MerkleProof {
     /// @param block_hash Hash of execution block
     /// @param transactions_root Root of transactions
     /// @param withdrawals_root Root of withdrawals [New in Capella]
+    /// @param blob_gas_used Gas used in blob [New in Deneb]
+    /// @param excess_blob_gas Excess gas in blob [New in Deneb]
     struct ExecutionPayloadHeader {
         bytes32 parent_hash;
         address fee_recipient;
@@ -111,6 +113,8 @@ contract BeaconChain is MerkleProof {
         bytes32 block_hash;
         bytes32 transactions_root;
         bytes32 withdrawals_root;
+        uint64 blob_gas_used;
+        uint64 excess_blob_gas;
     }
 
     /// @notice Return the signing root for the corresponding signing data.
@@ -193,7 +197,7 @@ contract BeaconChain is MerkleProof {
 
     /// @notice Return hash tree root of execution payload in Capella
     function hash_tree_root(ExecutionPayloadHeader memory execution_payload) internal pure returns (bytes32) {
-        bytes32[] memory leaves = new bytes32[](15);
+        bytes32[] memory leaves = new bytes32[](17);
         leaves[0] = execution_payload.parent_hash;
         leaves[1] = bytes32(bytes20(execution_payload.fee_recipient));
         leaves[2] = execution_payload.state_root;
@@ -209,6 +213,8 @@ contract BeaconChain is MerkleProof {
         leaves[12] = execution_payload.block_hash;
         leaves[13] = execution_payload.transactions_root;
         leaves[14] = execution_payload.withdrawals_root;
+        leaves[15] = bytes32(to_little_endian_64(execution_payload.blob_gas_used));
+        leaves[16] = bytes32(to_little_endian_64(execution_payload.excess_blob_gas));
         return merkle_root(leaves);
     }
 

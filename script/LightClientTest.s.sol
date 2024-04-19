@@ -58,7 +58,9 @@ contract LightClientTest is Script, BeaconLightClientUpdate {
                    base_fee_per_gas: 26147902783,
                    block_hash: 0x28391774a73b48e2fc48ecbfd62422e308f4c401641480beac0b3ac548cdac85,
                    transactions_root: 0x8f00687a32e53e5e450467999d362833478ce8abcb22464e982062110b67eea8,
-                   withdrawals_root: 0x7370d2b4909e806bc7764b9d5744e0fb61e8c492fa22bbd6b9483cbfcd4fc484
+                   withdrawals_root: 0x7370d2b4909e806bc7764b9d5744e0fb61e8c492fa22bbd6b9483cbfcd4fc484,
+                   blob_gas_used: 0,
+                   excess_blob_gas: 0
                 }),
                 execution_branch: execution_branch1
             }),
@@ -86,7 +88,9 @@ contract LightClientTest is Script, BeaconLightClientUpdate {
                     base_fee_per_gas: 27562011582,
                     block_hash: 0x5f1940f7c5f726045adff65890e28393a4a08f476d4dae50f74e8bc67de2f68b,
                     transactions_root: 0x8dca4857406b06ae6a0161f4e28854ab9ad570995d0af003917af4e5146d4b2a,
-                    withdrawals_root: 0x8cf868192fee7621ad486083a7708e6b99c1d23d36b5eef45ff50ec2ffdbf31b
+                    withdrawals_root: 0x8cf868192fee7621ad486083a7708e6b99c1d23d36b5eef45ff50ec2ffdbf31b,
+                    blob_gas_used: 0,
+                    excess_blob_gas: 0
                 }),
                 execution_branch: execution_branch2
             }),
