@@ -2,7 +2,7 @@
 //
 // Inspired: https://github.com/Snowfork/snowbridge/blob/main/core/packages/contracts/contracts/ScaleCodec.sol
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 library ScaleCodec {
     // Sources:

@@ -3,7 +3,7 @@
 // Inspired:
 // https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts-bedrock/src/libraries/Bytes.sol
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 library Nibble {
     /// @notice Converts a byte array into a nibble array by splitting each byte into two nibbles.

@@ -2,7 +2,7 @@
 //
 // Inspired: https://github.com/ethereum/solidity-examples
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import { Memory } from "./Memory.sol";
 

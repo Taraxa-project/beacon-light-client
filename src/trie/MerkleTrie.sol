@@ -3,7 +3,7 @@
 // Inspired:
 // https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts/contracts/libraries/trie/Lib_MerkleTrie.sol
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import { Bytes } from "../util/Bytes.sol";
 import { Nibble } from "./Nibble.sol";

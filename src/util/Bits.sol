@@ -2,7 +2,7 @@
 //
 // Inspired: https://github.com/ethereum/solidity-examples
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 library Bits {
     uint256 private constant ONE = uint256(1);

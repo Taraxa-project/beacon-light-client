@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import "./G1.sol";
 import "./G2.sol";
@@ -18,7 +18,7 @@ library BLS12Pairing {
         require(a.length == b.length, "!len");
         uint256 K = a.length;
         uint256 N = 12 * K;
-        uint256[] memory input = new uint[](N);
+        uint256[] memory input = new uint256[](N);
         for (uint256 i = 0; i < K; i++) {
             Bls12G1 memory g1 = a[i];
             Bls12G2 memory g2 = b[i];

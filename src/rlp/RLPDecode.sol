@@ -3,7 +3,7 @@
 // Inspired:
 // https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts-bedrock/src/libraries/rlp/RLPReader.sol
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import "../util/Memory.sol";
 

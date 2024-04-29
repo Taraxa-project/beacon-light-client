@@ -2,7 +2,7 @@
 //
 // Inspired: https://github.com/ethereum/solidity-examples
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 library Memory {
     uint256 private constant WORD_SIZE = 32;

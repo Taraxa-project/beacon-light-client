@@ -68,7 +68,7 @@
 //
 // Inspired: https://github.com/ethereum/annotated-spec/blob/master/altair/sync-protocol.md
 
-pragma solidity 0.8.17;
+pragma solidity ^0.8.17;
 
 import "./bls12381/BLS.sol";
 import "./util/Bitfield.sol";
