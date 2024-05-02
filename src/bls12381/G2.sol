@@ -20,11 +20,9 @@ library BLS12G2Affine {
     using BLS12FP2 for Bls12Fp2;
 
     /// @dev BLS12_381_G2ADD precompile address.
-    uint256 private constant G2_ADD = 0x0d;
-    // uint256 private constant G2_ADD = 0x0d;
+    uint256 private constant G2_ADD = 0x0e;
     /// @dev BLS12_381_MAP_FP2_TO_G2 precompile address.
-    uint256 private constant MAP_FP2_TO_G2 = 0x12;
-    // uint256 private constant MAP_FP2_TO_G2 = 0x12;
+    uint256 private constant MAP_FP2_TO_G2 = 0x13;
 
     bytes1 private constant COMPRESION_FLAG = bytes1(0x80);
     bytes1 private constant INFINITY_FLAG = bytes1(0x40);

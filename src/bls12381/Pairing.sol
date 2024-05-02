@@ -7,8 +7,7 @@ import "./G2.sol";
 /// @title BLS12Pairing
 library BLS12Pairing {
     /// @dev BLS12_377_PAIRING precompile address.
-    uint256 private constant BLS12_PAIRING = 0x12;
-    // uint256 private constant BLS12_PAIRING = 0x10;
+    uint256 private constant BLS12_PAIRING = 0x11;
 
     /// @dev Computes a "product" of pairings.
     /// @param a List of Bls12G1.

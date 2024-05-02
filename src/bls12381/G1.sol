@@ -18,8 +18,7 @@ library BLS12G1Affine {
     using BLS12FP for Bls12Fp;
 
     /// @dev BLS12_377_G1ADD precompile address.
-    uint256 private constant G1_ADD = 0x0a;
-    // uint256 private constant G1_ADD = 0x0a;
+    uint256 private constant G1_ADD = 0x0b;
 
     bytes1 private constant COMPRESION_FLAG = bytes1(0x80);
     bytes1 private constant INFINITY_FLAG = bytes1(0x40);
