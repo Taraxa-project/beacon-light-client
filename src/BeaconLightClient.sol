@@ -73,8 +73,9 @@ pragma solidity ^0.8.17;
 import "./bls12381/BLS.sol";
 import "./util/Bitfield.sol";
 import "./BeaconLightClientUpdate.sol";
+import "openzeppelin-contracts/contracts/access/Ownable.sol";
 
-contract BeaconLightClient is BeaconLightClientUpdate, Bitfield {
+contract BeaconLightClient is BeaconLightClientUpdate, Bitfield, Ownable {
     /// @dev Finalized beacon block header
     BeaconBlockHeader private finalized_header;
     /// @dev Finalized execution payload header block_number corresponding to `beacon.body_root` [New in Capella]
@@ -118,7 +119,9 @@ contract BeaconLightClient is BeaconLightClientUpdate, Bitfield {
         bytes32 _merkle_root,
         bytes32 _current_sync_committee_hash,
         bytes32 _genesis_validators_root
-    ) {
+    )
+        Ownable(msg.sender)
+    {
         finalized_header = BeaconBlockHeader(_slot, _proposer_index, _parent_root, _state_root, _body_root);
         finalized_execution_payload_header_block_number = _block_number;
         finalized_execution_payload_header_state_root = _merkle_root;
@@ -150,6 +153,7 @@ contract BeaconLightClient is BeaconLightClientUpdate, Bitfield {
         SyncCommitteePeriodUpdate calldata sc_update
     )
         external
+        onlyOwner
     {
         require(is_supermajority(header_update.sync_aggregate.sync_committee_bits), "!supermajor");
         require(
@@ -201,7 +205,7 @@ contract BeaconLightClient is BeaconLightClientUpdate, Bitfield {
     }
 
     /// @dev follow beacon api: /eth/v1/beacon/light_client/finality_update/
-    function import_finalized_header(FinalizedHeaderUpdate calldata update) external {
+    function import_finalized_header(FinalizedHeaderUpdate calldata update) external onlyOwner {
         require(is_supermajority(update.sync_aggregate.sync_committee_bits), "!supermajor");
         require(
             update.signature_slot > update.attested_header.beacon.slot
