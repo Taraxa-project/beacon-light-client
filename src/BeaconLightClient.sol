@@ -148,57 +148,17 @@ contract BeaconLightClient is BeaconLightClientUpdate, Bitfield, Ownable {
     }
 
     /// @dev follow beacon api: /beacon/light_client/updates/?start_period={period}&count={count}
-    function import_next_sync_committee(
-        FinalizedHeaderUpdate calldata header_update,
-        SyncCommitteePeriodUpdate calldata sc_update
-    )
-        external
-        onlyOwner
-    {
-        require(is_supermajority(header_update.sync_aggregate.sync_committee_bits), "!supermajor");
-        require(
-            header_update.signature_slot > header_update.attested_header.beacon.slot
-                && header_update.attested_header.beacon.slot >= header_update.finalized_header.beacon.slot,
-            "!skip"
-        );
-        verify_light_client_header(header_update);
-
-        uint64 attested_period = compute_sync_committee_period(header_update.attested_header.beacon.slot);
-        uint64 finalized_period = compute_sync_committee_period(header_update.finalized_header.beacon.slot);
-        uint64 signature_period = compute_sync_committee_period(header_update.signature_slot);
-        require(signature_period == finalized_period && finalized_period == attested_period, "!period");
-
-        bytes32 singature_sync_committee_root = sync_committee_roots[signature_period];
-        require(singature_sync_committee_root != bytes32(0), "!missing");
-        require(
-            singature_sync_committee_root == hash_tree_root(header_update.signature_sync_committee), "!sync_committee"
-        );
-
-        require(
-            verify_signed_header(
-                header_update.sync_aggregate,
-                header_update.signature_sync_committee,
-                header_update.fork_version,
-                header_update.attested_header.beacon
-            ),
-            "!sign"
-        );
-
-        if (header_update.finalized_header.beacon.slot > finalized_header.slot) {
-            apply_light_client_update(header_update);
-        }
-
+    // Header should be processed separately, so we will be sure that we didn't skip any needed header
+    function import_next_sync_committee(SyncCommitteePeriodUpdate calldata sc_update) external onlyOwner {
         bytes32 next_sync_committee_root = hash_tree_root(sc_update.next_sync_committee);
         require(
             verify_next_sync_committee(
-                next_sync_committee_root,
-                sc_update.next_sync_committee_branch,
-                header_update.attested_header.beacon.state_root
+                next_sync_committee_root, sc_update.next_sync_committee_branch, finalized_header.state_root
             ),
             "!next_sync_committee"
         );
-
-        uint64 next_period = signature_period + 1;
+        uint64 finalized_period = compute_sync_committee_period(finalized_header.slot);
+        uint64 next_period = finalized_period + 1;
         require(sync_committee_roots[next_period] == bytes32(0), "imported");
         sync_committee_roots[next_period] = next_sync_committee_root;
         emit NextSyncCommitteeImported(next_period, next_sync_committee_root);
