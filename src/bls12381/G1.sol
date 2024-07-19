@@ -30,10 +30,10 @@ library BLS12G1Affine {
         return Bls12G1({
             x: Bls12Fp(
                 0x17f1d3a73197d7942695638c4fa9ac0f, 0xc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb
-            ),
+                ),
             y: Bls12Fp(
                 0x114d1d6855d545a8aa7d76c8cf2e21f2, 0x67816aef1db507c96655b9d5caac42364e6f38ba0ecb751bad54dcd6b939c2ca
-            )
+                )
         });
     }
 
@@ -91,10 +91,13 @@ library BLS12G1Affine {
     }
 
     /// @dev Derive Bls12G1 from uint256[4].
-    /// @param x uint256[4].
+    /// @param input uint256[4].
     /// @return Bls12G1.
-    function from(uint256[4] memory x) internal pure returns (Bls12G1 memory) {
-        return Bls12G1(Bls12Fp(x[0], x[1]), Bls12Fp(x[2], x[3]));
+    function from(uint256[4] memory input) internal pure returns (Bls12G1 memory) {
+        Bls12Fp memory x = Bls12Fp(input[0], input[1]);
+        Bls12Fp memory y = Bls12Fp(input[2], input[3]);
+        require(x.is_valid() && y.is_valid(), "valid_input");
+        return Bls12G1(x, y);
     }
 
     // Take a 96 byte array and convert to a G1 point (x, y)

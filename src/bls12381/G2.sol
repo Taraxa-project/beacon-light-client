@@ -118,12 +118,13 @@ library BLS12G2Affine {
     }
 
     /// @dev Derive Bls12G1 from uint256[8].
-    /// @param x uint256[4].
+    /// @param input uint256[8].
     /// @return Bls12G2.
-    function from(uint256[8] memory x) internal pure returns (Bls12G2 memory) {
-        return Bls12G2(
-            Bls12Fp2(Bls12Fp(x[0], x[1]), Bls12Fp(x[2], x[3])), Bls12Fp2(Bls12Fp(x[4], x[5]), Bls12Fp(x[6], x[7]))
-        );
+    function from(uint256[8] memory input) internal pure returns (Bls12G2 memory) {
+        Bls12Fp2 memory x = Bls12Fp2(Bls12Fp(input[0], input[1]), Bls12Fp(input[2], input[3]));
+        Bls12Fp2 memory y = Bls12Fp2(Bls12Fp(input[4], input[5]), Bls12Fp(input[6], input[7]));
+        require(x.is_valid() && y.is_valid(), "valid_input");
+        return Bls12G2(x, y);
     }
 
     // Take a 192 byte array and convert to G2 point (x, y)
