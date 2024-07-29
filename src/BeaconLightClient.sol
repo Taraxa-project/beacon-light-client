@@ -81,9 +81,10 @@ contract BeaconLightClient is BeaconLightClientUpdate, Bitfield {
     uint256 private finalized_execution_payload_header_block_number;
     /// @dev Finalized execution payload header state_root corresponding to `beacon.body_root` [New in Capella]
     bytes32 private finalized_execution_payload_header_state_root;
-    /// @dev mapping for all state roots
-    mapping(uint256 => bytes32) public finalized_state_roots;
-
+    /// @dev Attested header state_root
+    uint256 private attested_header_block_number;
+    /// @dev Attested header state_root
+    bytes32 private attested_header_state_root;
     /// @dev Sync committees corresponding to the header
     /// sync_committee_perid => sync_committee_root
     mapping(uint64 => bytes32) public sync_committee_roots;
@@ -124,9 +125,6 @@ contract BeaconLightClient is BeaconLightClientUpdate, Bitfield {
         finalized_header = BeaconBlockHeader(_slot, _proposer_index, _parent_root, _state_root, _body_root);
         finalized_execution_payload_header_block_number = _block_number;
         finalized_execution_payload_header_state_root = _merkle_root;
-        // Initialize the state roots
-        finalized_state_roots[finalized_execution_payload_header_block_number] =
-            finalized_execution_payload_header_state_root;
         sync_committee_roots[compute_sync_committee_period(_slot)] = _current_sync_committee_hash;
         GENESIS_VALIDATORS_ROOT = _genesis_validators_root;
     }
@@ -136,23 +134,29 @@ contract BeaconLightClient is BeaconLightClientUpdate, Bitfield {
     function slot() public view returns (uint64) {
         return finalized_header.slot;
     }
-    /// @dev Return execution payload block number
-    /// @return block number
 
-    function block_number() public view returns (uint256) {
+    /// @dev Return finalized execution payload block number
+    /// @return block number
+    function finalized_block_number() public view returns (uint256) {
         return finalized_execution_payload_header_block_number;
     }
 
-    /// @dev Return execution payload state root
+    /// @dev Return finalized execution payload state root
     /// @return merkle root
-    function merkle_root() public view returns (bytes32) {
+    function finalized_merkle_root() public view returns (bytes32) {
         return finalized_execution_payload_header_state_root;
     }
 
-    /// @dev Return execution payload state root for the given block number
+    /// @dev Return execution payload block number
+    /// @return block number
+    function block_number() public view returns (uint256) {
+        return attested_header_block_number;
+    }
+
+    /// @dev Return state root from attested header
     /// @return merkle root
-    function merkle_root(uint256 blockNumber) public view returns (bytes32) {
-        return finalized_state_roots[blockNumber];
+    function merkle_root() public view returns (bytes32) {
+        return attested_header_state_root;
     }
 
     /// @dev follow beacon api: /beacon/light_client/updates/?start_period={period}&count={count}
@@ -280,8 +284,8 @@ contract BeaconLightClient is BeaconLightClientUpdate, Bitfield {
         finalized_header = update.finalized_header.beacon;
         finalized_execution_payload_header_block_number = update.finalized_header.execution.block_number;
         finalized_execution_payload_header_state_root = update.finalized_header.execution.state_root;
-        finalized_state_roots[finalized_execution_payload_header_block_number] =
-            finalized_execution_payload_header_state_root;
+        attested_header_state_root = update.attested_header.execution.state_root;
+        attested_header_block_number = update.attested_header.execution.block_number;
         emit FinalizedHeaderImported(update.finalized_header.beacon);
         emit FinalizedExecutionPayloadHeaderImported(
             update.finalized_header.execution.block_number, update.finalized_header.execution.state_root
@@ -316,7 +320,7 @@ contract BeaconLightClient is BeaconLightClientUpdate, Bitfield {
     function verify_finalized_header(
         BeaconBlockHeader calldata header,
         bytes32[] calldata finality_branch,
-        bytes32 attested_header_state_root
+        bytes32 attested_header_beacon_state_root
     )
         internal
         pure
@@ -328,7 +332,7 @@ contract BeaconLightClient is BeaconLightClientUpdate, Bitfield {
             finality_branch,
             FINALIZED_CHECKPOINT_ROOT_DEPTH,
             FINALIZED_CHECKPOINT_ROOT_INDEX,
-            attested_header_state_root
+            attested_header_beacon_state_root
         );
     }
 
