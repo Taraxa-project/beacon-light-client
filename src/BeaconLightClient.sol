@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Darwinia. If not, see <https://www.gnu.org/licenses/>.
 //
-// Etherum beacon light client.
-// Current arthitecture diverges from spec's proposed updated splitting them into:
+// Ethereum beacon light client.
+// Current architecture diverges from spec's proposed updated splitting them into:
 // - Finalized header updates: To import a recent finalized header signed by a known sync committee by
 // `import_finalized_header`.
 // - Sync period updates: To advance to the next committee by `import_next_sync_committee`.
@@ -41,7 +41,7 @@
 //
 // ```
 //                       Finalized               Block   Sync
-//                       Checkpoint              Header  Aggreate
+//                       Checkpoint              Header  Aggregate
 // ----------------------|-----------------------|-------|---------> time
 //                        <---------------------   <----
 //                         finalizes               signs
@@ -94,14 +94,14 @@ contract BeaconLightClient is BeaconLightClientUpdate, Bitfield {
     // | field                               | gindex | depth |
     // | ----------------------------------- | ------ | ----- |
     // | execution_payload                   | 25     | 4     |
-    // | next_sync_committee                 | 55     | 5     |
-    // | finalized_checkpoint_root           | 105    | 6     |
+    // | next_sync_committee                 | 87     | 6     |
+    // | finalized_checkpoint_root           | 169    | 7     |
     uint64 private constant EXECUTION_PAYLOAD_INDEX = 25;
     uint64 private constant EXECUTION_PAYLOAD_DEPTH = 4;
-    uint64 private constant NEXT_SYNC_COMMITTEE_INDEX = 55;
-    uint64 private constant NEXT_SYNC_COMMITTEE_DEPTH = 5;
-    uint64 private constant FINALIZED_CHECKPOINT_ROOT_INDEX = 105;
-    uint64 private constant FINALIZED_CHECKPOINT_ROOT_DEPTH = 6;
+    uint64 private constant NEXT_SYNC_COMMITTEE_INDEX = 87;
+    uint64 private constant NEXT_SYNC_COMMITTEE_DEPTH = 6;
+    uint64 private constant FINALIZED_CHECKPOINT_ROOT_INDEX = 169;
+    uint64 private constant FINALIZED_CHECKPOINT_ROOT_DEPTH = 7;
     uint64 private constant SLOTS_PER_EPOCH = 32;
     uint64 private constant EPOCHS_PER_SYNC_COMMITTEE_PERIOD = 256;
     bytes4 private constant DOMAIN_SYNC_COMMITTEE = 0x07000000;
